@@ -23,6 +23,21 @@ try:
 except:
     stress_le = None
 
+@app.route('/', methods=['GET'])
+def root():
+    """Root endpoint with API information."""
+    return jsonify({
+        'message': 'Aerovitals API is running',
+        'endpoints': {
+            'health': '/health',
+            'chat': '/chat',
+            'heartrate': '/heartrate',
+            'predict_sleep_disorder': '/predict_sleep_disorder',
+            'predict_stress_level': '/predict_stress_level'
+        },
+        'status': 'healthy'
+    })
+
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint for deployment monitoring."""
