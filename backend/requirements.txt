@@ -9,3 +9,5 @@ SpeechRecognition
 pyttsx3
 PyAudio
 gunicorn
+joblib
+pandas
