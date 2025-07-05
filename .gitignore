@@ -127,7 +127,6 @@ jspm_packages/
 # API Keys and Secrets
 *.pem
 *.key
-*.pkl
 *.h5
 *.model
 
