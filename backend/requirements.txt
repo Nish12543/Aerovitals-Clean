@@ -8,3 +8,4 @@ python-dotenv
 SpeechRecognition
 pyttsx3
 PyAudio
+gunicorn

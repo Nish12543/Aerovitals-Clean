@@ -23,6 +23,11 @@ try:
 except:
     stress_le = None
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint for deployment monitoring."""
+    return jsonify({'status': 'healthy', 'message': 'Aerovitals API is running'})
+
 @app.route('/chat', methods=['POST'])
 def chat():
     if request.json is not None:

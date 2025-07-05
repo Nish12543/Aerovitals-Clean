@@ -12,28 +12,43 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = "llama3-8b-8192"  # Fast and reliable model
 
-# Initialize text-to-speech engine
-engine = pyttsx3.init()
+# Initialize text-to-speech engine (only if available)
+try:
+    engine = pyttsx3.init()
+    SPEECH_AVAILABLE = True
+except Exception as e:
+    print(f"Warning: Text-to-speech not available: {e}")
+    SPEECH_AVAILABLE = False
 
 def speak(text):
-    """Convert text to speech."""
-    engine.say(text)
-    engine.runAndWait()
+    """Convert text to speech (only if available)."""
+    if SPEECH_AVAILABLE:
+        try:
+            engine.say(text)
+            engine.runAndWait()
+        except Exception as e:
+            print(f"Speech error: {e}")
+    else:
+        print(f"Text (speech disabled): {text}")
 
 def listen():
-    """Capture voice input from the user and convert it to text."""
-    recognizer = sr.Recognizer()
-    with sr.Microphone() as source:
-        print("🎤 Listening...")
-        recognizer.adjust_for_ambient_noise(source)
-        audio = recognizer.listen(source)
-        try:
-            print("🧠 Recognizing...")
-            return recognizer.recognize_google(audio)  # type: ignore
-        except sr.UnknownValueError:
-            return "Sorry, I didn't catch that."
-        except sr.RequestError:
-            return "Speech recognition service is unavailable."
+    """Capture voice input from the user and convert it to text (only if available)."""
+    try:
+        recognizer = sr.Recognizer()
+        with sr.Microphone() as source:
+            print("🎤 Listening...")
+            recognizer.adjust_for_ambient_noise(source)
+            audio = recognizer.listen(source)
+            try:
+                print("🧠 Recognizing...")
+                return recognizer.recognize_google(audio)  # type: ignore
+            except sr.UnknownValueError:
+                return "Sorry, I didn't catch that."
+            except sr.RequestError:
+                return "Speech recognition service is unavailable."
+    except Exception as e:
+        print(f"Microphone not available: {e}")
+        return "Speech recognition not available in this environment."
 
 def get_chatbot_response(user_input):
     """Send user input to the Groq model and return the response."""
@@ -72,7 +87,7 @@ def get_chatbot_response(user_input):
     except Exception as e:
         return f"Error connecting to Groq API: {str(e)}"
 
-# Main loop for interaction
+# Main loop for interaction (only runs if script is executed directly)
 if __name__ == "__main__":
     # Check if GROQ_API_KEY is set
     if not GROQ_API_KEY:

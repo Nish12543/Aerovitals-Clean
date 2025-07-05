@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: aerovitals-backend
+    env: docker
+    region: oregon
+    plan: free
+    buildCommand: cd backend && docker build -t aerovitals-backend .
+    startCommand: cd backend && docker run -p $PORT:5000 aerovitals-backend
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9
+      - key: GROQ_API_KEY
+        sync: false  # Set this in Render dashboard 
