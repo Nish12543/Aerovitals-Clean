@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 const genderOptions = ['Male', 'Female'];
 const bmiOptions = ['Overweight', 'Normal', 'Obese'];
@@ -25,7 +26,7 @@ const SleepDisorderForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/predict_sleep_disorder', form);
+      const response = await axios.post(`${API_BASE_URL}/predict_sleep_disorder`, form);
       setResult(response.data.prediction);
     } catch {
       setResult('Prediction failed');

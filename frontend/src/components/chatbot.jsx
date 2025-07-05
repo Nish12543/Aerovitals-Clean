@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
@@ -116,7 +117,7 @@ const Chatbot = () => {
 
     try {
       console.log('Sending message to backend:', userMessage);
-      const response = await axios.post('http://localhost:5000/chat', {
+      const response = await axios.post(`${API_BASE_URL}/chat`, {
         message: userMessage,
       });
 
@@ -129,8 +130,6 @@ const Chatbot = () => {
       setMessages([...newMessages, { sender: 'chatbot', text: 'Sorry, I cannot connect to the backend server. Please make sure the server is running.' }]);
     }
   };
-
-
 
   return (
     <div style={styles.container}>
@@ -176,7 +175,6 @@ const Chatbot = () => {
         >
           🎤 {listening ? 'Stop Listening' : 'Speak'}
         </button>
-
       </form>
     </div>
   );

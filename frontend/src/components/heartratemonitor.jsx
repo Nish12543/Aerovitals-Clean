@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Howl } from 'howler';
 import musicFile from '../assets/background-music-soft-piano-334995.mp3';
+import { API_BASE_URL } from '../config';
 
 const HeartRateMonitor = () => {
   const [heartRate, setHeartRate] = useState('');
@@ -38,7 +39,7 @@ const HeartRateMonitor = () => {
 
   const checkHeartRate = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/heartrate', {
+      const response = await axios.post(`${API_BASE_URL}/heartrate`, {
         heart_rate: heartRate
       });
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 const genderOptions = ['Male', 'Female'];
 const bmiOptions = ['Overweight', 'Normal', 'Obese'];
@@ -40,7 +41,7 @@ const StressLevelForm = () => {
     };
     delete payload['Blood Pressure'];
     try {
-      const response = await axios.post('http://localhost:5000/predict_stress_level', payload);
+      const response = await axios.post(`${API_BASE_URL}/predict_stress_level`, payload);
       setResult(response.data.prediction);
     } catch {
       setResult('Prediction failed');
