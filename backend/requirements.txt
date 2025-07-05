@@ -11,3 +11,4 @@ PyAudio
 gunicorn
 joblib
 pandas
+scikit-learn==1.6.0
