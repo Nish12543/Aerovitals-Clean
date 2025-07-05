@@ -1,0 +1,10 @@
+flask
+flask-cors
+transformers
+torch
+accelerate
+requests
+python-dotenv
+SpeechRecognition
+pyttsx3
+PyAudio
