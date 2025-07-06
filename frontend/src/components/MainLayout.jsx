@@ -27,10 +27,22 @@ function Hamburger({ onClick, isOpen }) {
         boxShadow: '0 2px 8px rgba(37,99,235,0.12)',
         transition: 'background 0.2s',
         outline: 'none',
+        userSelect: 'none',
+        touchAction: 'manipulation',
         '@media (max-width: 768px)': {
           top: '0.5rem',
           left: '0.5rem',
+          width: '48px',
+          height: '48px',
         }
+      }}
+      onTouchStart={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
       }}
     >
       <div style={{
@@ -41,6 +53,7 @@ function Hamburger({ onClick, isOpen }) {
         margin: '2px 0',
         transition: '0.3s',
         transform: isOpen ? 'rotate(45deg) translateY(4px)' : 'none',
+        pointerEvents: 'none',
       }} />
       <div style={{
         width: '20px',
@@ -50,6 +63,7 @@ function Hamburger({ onClick, isOpen }) {
         margin: '2px 0',
         opacity: isOpen ? 0 : 1,
         transition: '0.3s',
+        pointerEvents: 'none',
       }} />
       <div style={{
         width: '20px',
@@ -59,6 +73,7 @@ function Hamburger({ onClick, isOpen }) {
         margin: '2px 0',
         transition: '0.3s',
         transform: isOpen ? 'rotate(-45deg) translateY(-4px)' : 'none',
+        pointerEvents: 'none',
       }} />
     </button>
   );

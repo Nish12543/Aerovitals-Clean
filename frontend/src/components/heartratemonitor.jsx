@@ -48,6 +48,7 @@ const HeartRateMonitor = () => {
 
       setStatus(newStatus);
 
+      // Auto-play music if backend suggests it
       if (play && !isPlaying) {
         soundRef.current.play();
         setIsPlaying(true);
@@ -457,35 +458,37 @@ const HeartRateMonitor = () => {
               gap: '0.75rem',
             }
           }}>
-            <button
-              onClick={toggleMusic}
-              style={{
-                background: isPlaying ? '#ef4444' : '#10b981',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '0.75rem 1.25rem',
-                fontSize: '1rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                minHeight: '44px',
-                minWidth: '120px',
-                transition: 'transform 0.2s',
-                '@media (max-width: 768px)': {
-                  padding: '0.625rem 1rem',
-                  fontSize: '0.875rem',
-                  minWidth: '100px',
-                  width: '100%',
-                },
-                '@media (max-width: 480px)': {
-                  padding: '0.5rem 0.875rem',
-                  fontSize: '0.8rem',
-                  minWidth: '80px',
-                }
-              }}
-            >
-              {isPlaying ? 'Stop Music' : 'Play Music'}
-            </button>
+            {isPlaying && (
+              <button
+                onClick={toggleMusic}
+                style={{
+                  background: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '0.75rem 1.25rem',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  minHeight: '44px',
+                  minWidth: '120px',
+                  transition: 'transform 0.2s',
+                  '@media (max-width: 768px)': {
+                    padding: '0.625rem 1rem',
+                    fontSize: '0.875rem',
+                    minWidth: '100px',
+                    width: '100%',
+                  },
+                  '@media (max-width: 480px)': {
+                    padding: '0.5rem 0.875rem',
+                    fontSize: '0.8rem',
+                    minWidth: '80px',
+                  }
+                }}
+              >
+                Stop Music
+              </button>
+            )}
             
             <div style={{
               display: 'flex',
@@ -539,6 +542,20 @@ const HeartRateMonitor = () => {
               </span>
             </div>
           </div>
+          
+          {!isPlaying && (
+            <div style={{
+              fontSize: '0.875rem',
+              color: '#6b7280',
+              fontStyle: 'italic',
+              textAlign: 'center',
+              '@media (max-width: 480px)': {
+                fontSize: '0.8rem',
+              }
+            }}>
+              Music will play automatically when you check your heart rate
+            </div>
+          )}
         </div>
       </div>
     </div>
