@@ -284,8 +284,8 @@ const MainLayout = ({ children }) => {
       // Only auto-open sidebar on desktop, never on mobile
       if (!mobile && !sidebarOpen) {
         setSidebarOpen(true);
-      } else if (mobile && sidebarOpen) {
-        // Close sidebar when switching to mobile
+      } else if (mobile) {
+        // Always close sidebar when on mobile
         setSidebarOpen(false);
       }
     };
@@ -293,7 +293,7 @@ const MainLayout = ({ children }) => {
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [sidebarOpen]);
+  }, []); // Remove sidebarOpen from dependencies to prevent infinite loop
 
   // Close sidebar on route change (mobile UX)
   useEffect(() => {
