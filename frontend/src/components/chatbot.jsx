@@ -132,20 +132,84 @@ const Chatbot = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.header}>🛫 AeroVitals Voice Chatbot</h2>
+    <div style={{
+      maxWidth: '800px',
+      margin: '0 auto',
+      padding: '1rem',
+      backgroundColor: '#B5FFE1',
+      borderRadius: '16px',
+      boxShadow: '0 0 15px rgba(0, 0, 0, 0.1)',
+      fontFamily: 'Arial, sans-serif',
+      height: '80vh',
+      display: 'flex',
+      flexDirection: 'column',
+      '@media (max-width: 768px)': {
+        height: '70vh',
+        padding: '0.75rem',
+        margin: '0 0.5rem',
+      },
+      '@media (max-width: 480px)': {
+        height: '65vh',
+        padding: '0.5rem',
+      }
+    }}>
+      <h2 style={{
+        textAlign: 'center',
+        color: '#36827F',
+        marginBottom: '1.25rem',
+        fontSize: '1.5rem',
+        '@media (max-width: 768px)': {
+          fontSize: '1.25rem',
+          marginBottom: '1rem',
+        },
+        '@media (max-width: 480px)': {
+          fontSize: '1.125rem',
+          marginBottom: '0.75rem',
+        }
+      }}>
+        🛫 AeroVitals Voice Chatbot
+      </h2>
 
-      <div style={styles.chatBox}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.75rem',
+        flex: 1,
+        overflowY: 'auto',
+        padding: '0.75rem',
+        backgroundColor: '#f8f9fa',
+        borderRadius: '12px',
+        marginBottom: '1rem',
+        '@media (max-width: 768px)': {
+          padding: '0.5rem',
+          gap: '0.5rem',
+        }
+      }}>
         {messages.map((msg, index) => (
           <div
             key={index}
             style={{
-              ...styles.message,
               alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
               backgroundColor: msg.sender === 'user' ? '#b74545' : '#683B4A',
               color: '#fff',
-              borderTopLeftRadius: msg.sender === 'user' ? 16 : 4,
-              borderTopRightRadius: msg.sender === 'user' ? 4 : 16,
+              padding: '0.75rem 1rem',
+              borderRadius: '16px',
+              maxWidth: '80%',
+              wordWrap: 'break-word',
+              fontSize: '0.875rem',
+              lineHeight: 1.4,
+              borderTopLeftRadius: msg.sender === 'user' ? '16px' : '4px',
+              borderTopRightRadius: msg.sender === 'user' ? '4px' : '16px',
+              '@media (max-width: 768px)': {
+                maxWidth: '85%',
+                padding: '0.625rem 0.875rem',
+                fontSize: '0.8rem',
+              },
+              '@media (max-width: 480px)': {
+                maxWidth: '90%',
+                padding: '0.5rem 0.75rem',
+                fontSize: '0.75rem',
+              }
             }}
           >
             <strong>{msg.sender === 'user' ? 'You' : 'Bot'}:</strong> {msg.text}
@@ -153,86 +217,103 @@ const Chatbot = () => {
         ))}
       </div>
 
-      <form onSubmit={sendMessage} style={styles.inputArea}>
+      <form onSubmit={sendMessage} style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.75rem',
+      }}>
         <input
           type="text"
           placeholder="Type your message or use voice..."
           value={userMessage}
           onChange={(e) => setUserMessage(e.target.value)}
-          style={styles.input}
-        />
-        <button type="submit" style={styles.button}>Send</button>
-        <button
-          type="button"
-          onClick={listening ? stopListening : startListening}
-          disabled={!canStartListening && !listening}
-          style={{ 
-            ...styles.button, 
-            backgroundColor: listening ? '#FF5252' : '#2C98F0',
-            opacity: (!canStartListening && !listening) ? 0.6 : 1,
-            cursor: (!canStartListening && !listening) ? 'not-allowed' : 'pointer'
+          style={{
+            width: '100%',
+            padding: '0.875rem',
+            border: '1px solid #d1d5db',
+            borderRadius: '8px',
+            fontSize: '1rem',
+            backgroundColor: 'white',
+            minHeight: '44px',
+            '@media (max-width: 768px)': {
+              fontSize: '16px',
+              padding: '0.75rem',
+            },
+            '@media (max-width: 480px)': {
+              padding: '0.625rem',
+              fontSize: '0.875rem',
+            }
           }}
-        >
-          🎤 {listening ? 'Stop Listening' : 'Speak'}
-        </button>
+        />
+        
+        <div style={{
+          display: 'flex',
+          gap: '0.75rem',
+          '@media (max-width: 768px)': {
+            gap: '0.5rem',
+          }
+        }}>
+          <button 
+            type="submit" 
+            style={{
+              background: 'linear-gradient(90deg, #2563eb 0%, #60a5fa 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '0.875rem 1.5rem',
+              fontSize: '1rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              minHeight: '44px',
+              flex: 1,
+              transition: 'transform 0.2s',
+              '@media (max-width: 768px)': {
+                padding: '0.75rem 1.25rem',
+                fontSize: '0.875rem',
+              },
+              '@media (max-width: 480px)': {
+                padding: '0.625rem 1rem',
+                fontSize: '0.8rem',
+              }
+            }}
+          >
+            Send
+          </button>
+          <button
+            type="button"
+            onClick={listening ? stopListening : startListening}
+            disabled={!canStartListening && !listening}
+            style={{
+              background: listening ? '#FF5252' : '#2C98F0',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '0.875rem 1.5rem',
+              fontSize: '1rem',
+              fontWeight: '600',
+              cursor: (!canStartListening && !listening) ? 'not-allowed' : 'pointer',
+              opacity: (!canStartListening && !listening) ? 0.6 : 1,
+              minHeight: '44px',
+              minWidth: '120px',
+              transition: 'transform 0.2s',
+              '@media (max-width: 768px)': {
+                padding: '0.75rem 1.25rem',
+                fontSize: '0.875rem',
+                minWidth: '100px',
+              },
+              '@media (max-width: 480px)': {
+                padding: '0.625rem 1rem',
+                fontSize: '0.8rem',
+                minWidth: '90px',
+              }
+            }}
+          >
+            🎤 {listening ? 'Stop' : 'Speak'}
+          </button>
+        </div>
       </form>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '600px',
-    margin: '40px auto',
-    padding: '20px',
-    backgroundColor: '#B5FFE1',
-    borderRadius: '16px',
-    boxShadow: '0 0 15px rgba(0, 0, 0, 0.1)',
-    fontFamily: 'Arial, sans-serif',
-  },
-  header: {
-    textAlign: 'center',
-    color: '#36827F',
-    marginBottom: '20px',
-  },
-  chatBox: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-    height: '350px',
-    overflowY: 'auto',
-    padding: '10px',
-    backgroundColor: '#ffffff',
-    borderRadius: '12px',
-    border: '2px solid #36827F',
-  },
-  message: {
-    maxWidth: '75%',
-    padding: '12px',
-    borderRadius: '16px',
-    fontSize: '14px',
-  },
-  inputArea: {
-    display: 'flex',
-    marginTop: '16px',
-    gap: '10px',
-  },
-  input: {
-    flexGrow: 1,
-    padding: '10px 12px',
-    fontSize: '16px',
-    border: '2px solid #30b9f9',
-    borderRadius: '8px',
-  },
-  button: {
-    backgroundColor: '#0E85FB',
-    color: 'white',
-    border: 'none',
-    padding: '10px 14px',
-    borderRadius: '8px',
-    fontSize: '14px',
-    cursor: 'pointer',
-  },
 };
 
 export default Chatbot;

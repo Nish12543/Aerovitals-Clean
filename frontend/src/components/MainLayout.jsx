@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FaComments, FaHeartbeat, FaBed, FaPlane } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaComments, FaHeartbeat, FaBed, FaPlane, FaTimes } from 'react-icons/fa';
 
 // Hamburger icon component
 function Hamburger({ onClick, isOpen }) {
@@ -11,14 +11,14 @@ function Hamburger({ onClick, isOpen }) {
       aria-label={isOpen ? 'Close sidebar' : 'Open sidebar'}
       style={{
         position: 'fixed',
-        top: 24,
-        left: 24,
+        top: '1rem',
+        left: '1rem',
         zIndex: 1001,
         background: 'rgba(37,99,235,0.95)',
         border: 'none',
         borderRadius: '8px',
-        width: 44,
-        height: 44,
+        width: '44px',
+        height: '44px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -27,34 +27,38 @@ function Hamburger({ onClick, isOpen }) {
         boxShadow: '0 2px 8px rgba(37,99,235,0.12)',
         transition: 'background 0.2s',
         outline: 'none',
+        '@media (max-width: 768px)': {
+          top: '0.5rem',
+          left: '0.5rem',
+        }
       }}
     >
       <div style={{
-        width: 24,
-        height: 3,
+        width: '20px',
+        height: '2px',
         background: 'white',
-        borderRadius: 2,
-        margin: '2.5px 0',
+        borderRadius: '1px',
+        margin: '2px 0',
         transition: '0.3s',
-        transform: isOpen ? 'rotate(45deg) translateY(7px)' : 'none',
+        transform: isOpen ? 'rotate(45deg) translateY(4px)' : 'none',
       }} />
       <div style={{
-        width: 24,
-        height: 3,
+        width: '20px',
+        height: '2px',
         background: 'white',
-        borderRadius: 2,
-        margin: '2.5px 0',
+        borderRadius: '1px',
+        margin: '2px 0',
         opacity: isOpen ? 0 : 1,
         transition: '0.3s',
       }} />
       <div style={{
-        width: 24,
-        height: 3,
+        width: '20px',
+        height: '2px',
         background: 'white',
-        borderRadius: 2,
-        margin: '2.5px 0',
+        borderRadius: '1px',
+        margin: '2px 0',
         transition: '0.3s',
-        transform: isOpen ? 'rotate(-45deg) translateY(-7px)' : 'none',
+        transform: isOpen ? 'rotate(-45deg) translateY(-4px)' : 'none',
       }} />
     </button>
   );
@@ -63,62 +67,237 @@ function Hamburger({ onClick, isOpen }) {
 // Sidebar component
 function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
+  
   return (
-    <motion.aside
-      initial={{ x: -260 }}
-      animate={{ x: isOpen ? 0 : -260 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      style={{ ...styles.sidebar, position: 'fixed', left: 0, top: 0, height: '100vh', zIndex: 1000, boxShadow: isOpen ? '2px 0 12px rgba(37,99,235,0.08)' : 'none' }}
-    >
-      <div style={styles.sidebarTitle}>
-        <FaPlane style={{ marginRight: 8 }} />
-        AeroVitals
-      </div>
-      <div style={styles.avatarContainer}>
-        <img src="frontend\\src\\images\\passenger.png" alt="Passenger" style={styles.avatar} />
-        <div style={styles.avatarName}>Passenger</div>
-      </div>
-      <nav>
-        <ul style={styles.sidebarList}>
-          <li>
-            <Link to="/dashboard" style={{ ...styles.sidebarLink, ...(location.pathname === '/dashboard' ? styles.activeLink : {}) }} onClick={onClose}>
-              <FaComments style={styles.icon} /> Chatbot
-            </Link>
-          </li>
-          <li>
-            <Link to="/sleep-disorder" style={{ ...styles.sidebarLink, ...(location.pathname === '/sleep-disorder' ? styles.activeLink : {}) }} onClick={onClose}>
-              <FaBed style={styles.icon} /> Sleep Disorder
-            </Link>
-          </li>
-          <li>
-            <Link to="/stress-level" style={{ ...styles.sidebarLink, ...(location.pathname === '/stress-level' ? styles.activeLink : {}) }} onClick={onClose}>
-              <FaHeartbeat style={styles.icon} /> Stress Level
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </motion.aside>
+    <>
+      {/* Mobile overlay */}
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 999,
+            '@media (min-width: 769px)': {
+              display: 'none',
+            }
+          }}
+        />
+      )}
+      
+      <motion.aside
+        initial={{ x: -280 }}
+        animate={{ x: isOpen ? 0 : -280 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        style={{
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          height: '100vh',
+          width: '280px',
+          background: 'linear-gradient(180deg, #2563eb 0%, #60a5fa 100%)',
+          color: 'white',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          padding: '2rem 0',
+          zIndex: 1000,
+          boxShadow: isOpen ? '2px 0 12px rgba(37,99,235,0.08)' : 'none',
+          '@media (max-width: 768px)': {
+            width: '100vw',
+            maxWidth: '320px',
+          }
+        }}
+      >
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          width: '100%',
+          padding: '0 1.5rem',
+          marginBottom: '2rem',
+        }}>
+          <div style={{
+            fontSize: '1.5rem',
+            fontWeight: 700,
+            letterSpacing: '1px',
+            textShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+          }}>
+            <FaPlane />
+            AeroVitals
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'white',
+              fontSize: '1.2rem',
+              cursor: 'pointer',
+              padding: '0.5rem',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              '@media (min-width: 769px)': {
+                display: 'none',
+              }
+            }}
+          >
+            <FaTimes />
+          </button>
+        </div>
+        
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          marginBottom: '2rem',
+        }}>
+          <img 
+            src="frontend\\src\\images\\passenger.png" 
+            alt="Passenger" 
+            style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              marginBottom: '0.5rem',
+              objectFit: 'cover',
+              border: '2px solid #fff',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+            }} 
+          />
+          <div style={{
+            fontSize: '1.1rem',
+            fontWeight: '600',
+            color: 'white',
+            letterSpacing: '0.5px',
+          }}>
+            Passenger
+          </div>
+        </div>
+        
+        <nav style={{ width: '100%' }}>
+          <ul style={{
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+            width: '100%',
+          }}>
+            <li>
+              <Link 
+                to="/dashboard" 
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '1rem 1.5rem',
+                  color: 'white',
+                  textDecoration: 'none',
+                  fontSize: '1rem',
+                  borderRadius: '0 24px 24px 0',
+                  marginBottom: '0.5rem',
+                  transition: 'background 0.2s, color 0.2s',
+                  background: location.pathname === '/dashboard' ? 'rgba(255,255,255,0.18)' : 'transparent',
+                  color: location.pathname === '/dashboard' ? '#1e293b' : 'white',
+                  fontWeight: location.pathname === '/dashboard' ? 600 : 400,
+                }} 
+                onClick={onClose}
+              >
+                <FaHeartbeat style={{ marginRight: '0.5rem' }} /> 
+                Dashboard
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/sleep-disorder" 
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '1rem 1.5rem',
+                  color: 'white',
+                  textDecoration: 'none',
+                  fontSize: '1rem',
+                  borderRadius: '0 24px 24px 0',
+                  marginBottom: '0.5rem',
+                  transition: 'background 0.2s, color 0.2s',
+                  background: location.pathname === '/sleep-disorder' ? 'rgba(255,255,255,0.18)' : 'transparent',
+                  color: location.pathname === '/sleep-disorder' ? '#1e293b' : 'white',
+                  fontWeight: location.pathname === '/sleep-disorder' ? 600 : 400,
+                }} 
+                onClick={onClose}
+              >
+                <FaBed style={{ marginRight: '0.5rem' }} /> 
+                Sleep Disorder
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/stress-level" 
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '1rem 1.5rem',
+                  color: 'white',
+                  textDecoration: 'none',
+                  fontSize: '1rem',
+                  borderRadius: '0 24px 24px 0',
+                  marginBottom: '0.5rem',
+                  transition: 'background 0.2s, color 0.2s',
+                  background: location.pathname === '/stress-level' ? 'rgba(255,255,255,0.18)' : 'transparent',
+                  color: location.pathname === '/stress-level' ? '#1e293b' : 'white',
+                  fontWeight: location.pathname === '/stress-level' ? 600 : 400,
+                }} 
+                onClick={onClose}
+              >
+                <FaHeartbeat style={{ marginRight: '0.5rem' }} /> 
+                Stress Level
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </motion.aside>
+    </>
   );
 }
 
 const MainLayout = ({ children }) => {
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Handle responsive behavior
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Close sidebar on route change (mobile UX)
   useEffect(() => {
-    setSidebarOpen(false);
-  }, [location.pathname]);
-
-  // Show sidebar by default on desktop
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 900) setSidebarOpen(true);
-    };
-    window.addEventListener('resize', handleResize);
-    handleResize();
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname, isMobile]);
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
@@ -148,156 +327,132 @@ const MainLayout = ({ children }) => {
           }
         }
       `}</style>
-      <div style={styles.appContainer}>
+      
+      <div style={{
+        display: 'flex',
+        minHeight: '100vh',
+        backgroundColor: '#f8fafc',
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+      }}>
         <Hamburger onClick={() => setSidebarOpen((v) => !v)} isOpen={sidebarOpen} />
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <div style={{ ...styles.contentArea, marginLeft: sidebarOpen ? 240 : 0, transition: 'margin-left 0.3s', position: 'relative', zIndex: 1 }}>
-          <header style={styles.header}>
-            <div style={{ position: 'relative', width: '100%', height: 60 }}>
-              <motion.div
-                key={location.pathname}
-                initial={{ x: -80, rotate: -10, opacity: 0.7 }}
-                animate={{ x: 'calc(100vw - 320px)', rotate: 10, opacity: 1 }}
-                exit={{ x: '100vw', opacity: 0 }}
-                transition={{ duration: 1.2, type: 'spring', bounce: 0.3 }}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  fontSize: 40,
-                  color: '#fff',
-                  zIndex: 2,
-                  filter: 'drop-shadow(0 2px 8px #2563eb88)'
-                }}
-              >
-                <FaPlane />
-              </motion.div>
-              <h1 style={styles.title}>AeroVitals</h1>
-              <p style={styles.subtitle}>Your in-flight personal health monitoring platform</p>
+        
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh',
+          marginLeft: isMobile ? 0 : (sidebarOpen ? '280px' : 0),
+          transition: 'margin-left 0.3s',
+          position: 'relative',
+          zIndex: 1,
+          '@media (max-width: 768px)': {
+            marginLeft: 0,
+          }
+        }}>
+          <header style={{
+            backgroundColor: '#3b82f6',
+            color: 'white',
+            padding: '1rem',
+            textAlign: 'center',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+            '@media (max-width: 768px)': {
+              padding: '0.75rem',
+            }
+          }}>
+            <div style={{
+              position: 'relative',
+              width: '100%',
+              height: 'auto',
+              minHeight: '60px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              '@media (max-width: 768px)': {
+                minHeight: '50px',
+              }
+            }}>
+              <h1 style={{
+                fontSize: isMobile ? '1.5rem' : '2rem',
+                fontWeight: '600',
+                margin: '0.5rem 0',
+                '@media (max-width: 768px)': {
+                  fontSize: '1.25rem',
+                  margin: '0.25rem 0',
+                }
+              }}>
+                AeroVitals
+              </h1>
+              <p style={{
+                fontSize: isMobile ? '0.875rem' : '1rem',
+                opacity: 0.9,
+                margin: '0.25rem 0 0',
+                '@media (max-width: 768px)': {
+                  fontSize: '0.75rem',
+                  margin: '0.125rem 0 0',
+                }
+              }}>
+                Your in-flight personal health monitoring platform
+              </p>
             </div>
           </header>
-          <main style={styles.mainContent}>
-            {children}
+          
+          <main style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: isMobile ? '1rem' : '2rem',
+            maxWidth: '1400px',
+            margin: '0 auto',
+            width: '100%',
+            '@media (max-width: 768px)': {
+              padding: '0.75rem',
+            }
+          }}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                transition={{ 
+                  duration: 0.4, 
+                  ease: [0.4, 0, 0.2, 1],
+                  scale: {
+                    duration: 0.3,
+                    ease: [0.4, 0, 0.2, 1]
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
           </main>
-          <footer style={styles.footer}>
+          
+          <footer style={{
+            textAlign: 'center',
+            padding: isMobile ? '0.75rem' : '1rem',
+            backgroundColor: '#e2e8f0',
+            color: '#64748b',
+            fontSize: isMobile ? '0.75rem' : '0.875rem',
+          }}>
             <p>© {new Date().getFullYear()} AeroVitals</p>
           </footer>
         </div>
       </div>
     </div>
   );
-};
-
-const styles = {
-  appContainer: {
-    display: 'flex',
-    minHeight: '100vh',
-    backgroundColor: '#f8fafc',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
-  },
-  sidebar: {
-    width: '240px',
-    background: 'linear-gradient(180deg, #2563eb 0%, #60a5fa 100%)',
-    color: 'white',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '32px 0',
-    minHeight: '100vh',
-    boxShadow: '2px 0 12px rgba(37,99,235,0.08)'
-  },
-  sidebarTitle: {
-    fontSize: '1.7rem',
-    fontWeight: 700,
-    marginBottom: '2.5rem',
-    letterSpacing: '1px',
-    textShadow: '0 2px 8px rgba(0,0,0,0.08)'
-  },
-  sidebarList: {
-    listStyle: 'none',
-    padding: 0,
-    width: '100%',
-  },
-  sidebarLink: {
-    display: 'block',
-    padding: '14px 32px',
-    color: 'white',
-    textDecoration: 'none',
-    fontSize: '1.1rem',
-    borderRadius: '0 24px 24px 0',
-    marginBottom: '8px',
-    transition: 'background 0.2s, color 0.2s',
-  },
-  activeLink: {
-    background: 'rgba(255,255,255,0.18)',
-    color: '#1e293b',
-    fontWeight: 600,
-  },
-  contentArea: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100vh',
-  },
-  header: {
-    backgroundColor: '#3b82f6',
-    color: 'white',
-    padding: '1.5rem',
-    textAlign: 'center',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-  },
-  title: {
-    fontSize: '2rem',
-    fontWeight: '600',
-    margin: 0
-  },
-  subtitle: {
-    fontSize: '1rem',
-    opacity: 0.9,
-    margin: '0.5rem 0 0'
-  },
-  mainContent: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '2rem',
-    maxWidth: '1400px',
-    margin: '0 auto',
-    width: '100%'
-  },
-  footer: {
-    textAlign: 'center',
-    padding: '1rem',
-    backgroundColor: '#e2e8f0',
-    color: '#64748b',
-    fontSize: '0.875rem'
-  },
-  avatarContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginBottom: '2rem',
-  },
-  avatar: {
-    width: '56px',
-    height: '56px',
-    borderRadius: '50%',
-    marginBottom: '0.5rem',
-    objectFit: 'cover',
-    border: '2px solid #fff',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-  },
-  avatarName: {
-    fontSize: '1.1rem',
-    fontWeight: '600',
-    color: 'white',
-    letterSpacing: '0.5px',
-  },
-  icon: {
-    marginRight: '0.5rem',
-  },
 };
 
 export default MainLayout; 

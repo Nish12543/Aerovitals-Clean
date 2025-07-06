@@ -117,8 +117,22 @@ const HeartRateMonitor = () => {
             alignItems: 'center',
           }}
         >
-          <div style={{ height: '8px', width: '1px', backgroundColor: '#6B7280' }}></div>
-          <div style={{ fontSize: '10px', marginTop: '4px' }}>{bpm}</div>
+          <div style={{ 
+            height: '8px', 
+            width: '1px', 
+            backgroundColor: '#6B7280',
+            '@media (max-width: 768px)': {
+              height: '6px',
+            }
+          }}></div>
+          <div style={{ 
+            fontSize: '10px', 
+            marginTop: '4px',
+            '@media (max-width: 768px)': {
+              fontSize: '8px',
+              marginTop: '2px',
+            }
+          }}>{bpm}</div>
         </div>
       );
     }
@@ -126,23 +140,114 @@ const HeartRateMonitor = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>HEART RATE MONITOR</h2>
+    <div style={{
+      maxWidth: '800px',
+      margin: '0 auto',
+      padding: '2rem',
+      backgroundColor: '#f8fafc',
+      borderRadius: '16px',
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+      fontFamily: 'Arial, sans-serif',
+      '@media (max-width: 768px)': {
+        padding: '1.5rem',
+        margin: '0 1rem',
+      },
+      '@media (max-width: 480px)': {
+        padding: '1rem',
+        margin: '0 0.5rem',
+      }
+    }}>
+      <h2 style={{
+        textAlign: 'center',
+        color: '#1f2937',
+        marginBottom: '2rem',
+        fontSize: '2rem',
+        fontWeight: '700',
+        '@media (max-width: 768px)': {
+          fontSize: '1.5rem',
+          marginBottom: '1.5rem',
+        },
+        '@media (max-width: 480px)': {
+          fontSize: '1.25rem',
+          marginBottom: '1rem',
+        }
+      }}>
+        HEART RATE MONITOR
+      </h2>
       
       {/* Heart Rate Display */}
-      <div style={styles.rateDisplay}>
-        <div style={styles.rateValue}>{heartRate || '--'}</div>
-        <div style={styles.rateUnit}>bpm</div>
+      <div style={{
+        textAlign: 'center',
+        marginBottom: '2rem',
+        '@media (max-width: 768px)': {
+          marginBottom: '1.5rem',
+        }
+      }}>
+        <div style={{
+          fontSize: '4rem',
+          fontWeight: '700',
+          color: '#1f2937',
+          lineHeight: 1,
+          '@media (max-width: 768px)': {
+            fontSize: '3rem',
+          },
+          '@media (max-width: 480px)': {
+            fontSize: '2.5rem',
+          }
+        }}>
+          {heartRate || '--'}
+        </div>
+        <div style={{
+          fontSize: '1.5rem',
+          color: '#6b7280',
+          marginTop: '0.5rem',
+          '@media (max-width: 768px)': {
+            fontSize: '1.25rem',
+          },
+          '@media (max-width: 480px)': {
+            fontSize: '1rem',
+          }
+        }}>
+          bpm
+        </div>
         {status && (
-          <div style={{...styles.statusText, color: status.color}}>
+          <div style={{
+            fontSize: '1.25rem',
+            fontWeight: '600',
+            marginTop: '1rem',
+            color: status.color,
+            '@media (max-width: 768px)': {
+              fontSize: '1rem',
+              marginTop: '0.75rem',
+            },
+            '@media (max-width: 480px)': {
+              fontSize: '0.875rem',
+              marginTop: '0.5rem',
+            }
+          }}>
             {status.text}
           </div>
         )}
       </div>
       
       {/* Color-coded Bar Indicator */}
-      <div style={styles.barContainer}>
-        <div style={styles.scaleContainer}>
+      <div style={{
+        marginBottom: '2rem',
+        '@media (max-width: 768px)': {
+          marginBottom: '1.5rem',
+        }
+      }}>
+        <div style={{
+          position: 'relative',
+          height: '60px',
+          marginBottom: '1rem',
+          '@media (max-width: 768px)': {
+            height: '50px',
+          },
+          '@media (max-width: 480px)': {
+            height: '40px',
+          }
+        }}>
           {generateScaleTicks()}
           {/* Pointer on the number line */}
           {status && (
@@ -153,6 +258,12 @@ const HeartRateMonitor = () => {
                 bottom: '16px',
                 transform: 'translateX(-50%)',
                 zIndex: 10,
+                '@media (max-width: 768px)': {
+                  bottom: '12px',
+                },
+                '@media (max-width: 480px)': {
+                  bottom: '8px',
+                }
               }}
             >
               <div style={{
@@ -162,14 +273,31 @@ const HeartRateMonitor = () => {
                 backgroundColor: status.color,
                 border: '2px solid white',
                 boxShadow: '0 0 4px rgba(0,0,0,0.3)',
+                '@media (max-width: 480px)': {
+                  width: '8px',
+                  height: '8px',
+                }
               }}></div>
             </div>
           )}
         </div>
-        <div style={styles.barBackground}>
+        <div style={{
+          position: 'relative',
+          height: '20px',
+          backgroundColor: '#e5e7eb',
+          borderRadius: '10px',
+          overflow: 'hidden',
+          '@media (max-width: 768px)': {
+            height: '16px',
+          },
+          '@media (max-width: 480px)': {
+            height: '12px',
+          }
+        }}>
           {/* Gradient from blue (low) to green (normal) to red (high) */}
           <div style={{
-            ...styles.barFill,
+            width: '100%',
+            height: '100%',
             background: `linear-gradient(
               90deg, 
               #3B82F6 0%, 
@@ -183,194 +311,238 @@ const HeartRateMonitor = () => {
           {status && (
             <div 
               style={{
-                ...styles.barPointer,
+                position: 'absolute',
                 left: `${status.position}%`,
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 5,
               }}
             >
-              <div style={{...styles.pointerArrow, borderBottomColor: status.color}}></div>
-              <div style={{...styles.pointerLine, backgroundColor: status.color}}></div>
+              <div style={{
+                width: '0',
+                height: '0',
+                borderLeft: '6px solid transparent',
+                borderRight: '6px solid transparent',
+                borderBottom: '8px solid',
+                borderBottomColor: status.color,
+                '@media (max-width: 480px)': {
+                  borderLeft: '4px solid transparent',
+                  borderRight: '4px solid transparent',
+                  borderBottom: '6px solid',
+                  borderBottomColor: status.color,
+                }
+              }}></div>
+              <div style={{
+                width: '2px',
+                height: '20px',
+                backgroundColor: status.color,
+                margin: '0 auto',
+                '@media (max-width: 768px)': {
+                  height: '16px',
+                },
+                '@media (max-width: 480px)': {
+                  height: '12px',
+                }
+              }}></div>
             </div>
           )}
         </div>
       </div>
       
       {/* Input and Controls */}
-      <div style={styles.inputContainer}>
-        <input
-          type="number"
-          value={heartRate}
-          onChange={(e) => setHeartRate(e.target.value)}
-          placeholder={`Enter heart rate (${MIN_BPM}-${MAX_BPM} bpm)`}
-          style={styles.input}
-          min={MIN_BPM}
-          max={MAX_BPM}
-        />
-        <button onClick={checkHeartRate} style={styles.button}>CHECK</button>
-      </div>
-
-      <div style={styles.musicControls}>
-        <button 
-          onClick={toggleMusic} 
-          style={{
-            ...styles.musicButton,
-            backgroundColor: isPlaying ? '#EF4444' : '#10B981'
-          }}
-        >
-          {isPlaying ? '⏸ PAUSE MUSIC' : '▶️ PLAY MUSIC'}
-        </button>
-        
-        <div style={styles.volumeControl}>
-          <label style={styles.volumeLabel}>VOLUME:</label>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1.5rem',
+        '@media (max-width: 768px)': {
+          gap: '1rem',
+        }
+      }}>
+        <div style={{
+          display: 'flex',
+          gap: '1rem',
+          alignItems: 'center',
+          '@media (max-width: 768px)': {
+            flexDirection: 'column',
+            gap: '0.75rem',
+          }
+        }}>
           <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.1"
-            value={volume}
-            onChange={handleVolumeChange}
-            style={styles.volumeSlider}
+            type="number"
+            placeholder="Enter heart rate (40-200 bpm)"
+            value={heartRate}
+            onChange={(e) => setHeartRate(e.target.value)}
+            style={{
+              flex: 1,
+              padding: '0.875rem',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '1rem',
+              backgroundColor: 'white',
+              minHeight: '44px',
+              '@media (max-width: 768px)': {
+                fontSize: '16px',
+                width: '100%',
+              },
+              '@media (max-width: 480px)': {
+                padding: '0.75rem',
+                fontSize: '0.875rem',
+              }
+            }}
           />
+          <button
+            onClick={checkHeartRate}
+            style={{
+              background: 'linear-gradient(90deg, #2563eb 0%, #60a5fa 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '0.875rem 1.5rem',
+              fontSize: '1rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              minHeight: '44px',
+              minWidth: '120px',
+              transition: 'transform 0.2s',
+              '@media (max-width: 768px)': {
+                padding: '0.75rem 1.25rem',
+                fontSize: '0.875rem',
+                minWidth: '100px',
+                width: '100%',
+              },
+              '@media (max-width: 480px)': {
+                padding: '0.625rem 1rem',
+                fontSize: '0.8rem',
+                minWidth: '80px',
+              }
+            }}
+          >
+            Check Rate
+          </button>
+        </div>
+        
+        {/* Music Controls */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1rem',
+          padding: '1.5rem',
+          backgroundColor: '#f1f5f9',
+          borderRadius: '12px',
+          '@media (max-width: 768px)': {
+            padding: '1rem',
+            gap: '0.75rem',
+          }
+        }}>
+          <h3 style={{
+            margin: 0,
+            fontSize: '1.25rem',
+            color: '#1f2937',
+            '@media (max-width: 768px)': {
+              fontSize: '1.125rem',
+            },
+            '@media (max-width: 480px)': {
+              fontSize: '1rem',
+            }
+          }}>
+            Music Controls
+          </h3>
+          
+          <div style={{
+            display: 'flex',
+            gap: '1rem',
+            alignItems: 'center',
+            '@media (max-width: 768px)': {
+              flexDirection: 'column',
+              gap: '0.75rem',
+            }
+          }}>
+            <button
+              onClick={toggleMusic}
+              style={{
+                background: isPlaying ? '#ef4444' : '#10b981',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '0.75rem 1.25rem',
+                fontSize: '1rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                minHeight: '44px',
+                minWidth: '120px',
+                transition: 'transform 0.2s',
+                '@media (max-width: 768px)': {
+                  padding: '0.625rem 1rem',
+                  fontSize: '0.875rem',
+                  minWidth: '100px',
+                  width: '100%',
+                },
+                '@media (max-width: 480px)': {
+                  padding: '0.5rem 0.875rem',
+                  fontSize: '0.8rem',
+                  minWidth: '80px',
+                }
+              }}
+            >
+              {isPlaying ? 'Stop Music' : 'Play Music'}
+            </button>
+            
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              flex: 1,
+              '@media (max-width: 768px)': {
+                width: '100%',
+              }
+            }}>
+              <label style={{
+                fontSize: '0.875rem',
+                color: '#374151',
+                fontWeight: '500',
+                '@media (max-width: 480px)': {
+                  fontSize: '0.8rem',
+                }
+              }}>
+                Volume:
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                value={volume}
+                onChange={handleVolumeChange}
+                style={{
+                  flex: 1,
+                  height: '6px',
+                  borderRadius: '3px',
+                  background: '#d1d5db',
+                  outline: 'none',
+                  cursor: 'pointer',
+                  '@media (max-width: 480px)': {
+                    height: '4px',
+                  }
+                }}
+              />
+              <span style={{
+                fontSize: '0.875rem',
+                color: '#6b7280',
+                minWidth: '30px',
+                textAlign: 'right',
+                '@media (max-width: 480px)': {
+                  fontSize: '0.8rem',
+                  minWidth: '25px',
+                }
+              }}>
+                {Math.round(volume * 100)}%
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    backgroundColor: '#FFFFFF',
-    padding: '25px',
-    borderRadius: '16px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-    maxWidth: '500px',
-    margin: '0 auto',
-    fontFamily: "'Segoe UI', system-ui, sans-serif",
-  },
-  title: {
-    color: '#1F2937',
-    textAlign: 'center',
-    marginBottom: '25px',
-    fontSize: '18px',
-    fontWeight: '600',
-  },
-  rateDisplay: {
-    textAlign: 'center',
-    marginBottom: '15px',
-  },
-  rateValue: {
-    fontSize: '48px',
-    fontWeight: '700',
-    color: '#111827',
-    lineHeight: '1',
-  },
-  rateUnit: {
-    fontSize: '16px',
-    color: '#6B7280',
-    marginTop: '4px',
-  },
-  statusText: {
-    fontSize: '14px',
-    fontWeight: '600',
-    marginTop: '10px',
-    textTransform: 'uppercase',
-  },
-  barContainer: {
-    margin: '30px 0',
-    position: 'relative',
-  },
-  scaleContainer: {
-    position: 'relative',
-    height: '30px',
-    width: '100%',
-    marginBottom: '5px',
-  },
-  barBackground: {
-    height: '12px',
-    borderRadius: '6px',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  barFill: {
-    height: '100%',
-    width: '100%',
-  },
-  barPointer: {
-    position: 'absolute',
-    top: '-12px',
-    transform: 'translateX(-50%)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  pointerArrow: {
-    width: 0,
-    height: 0,
-    borderLeft: '10px solid transparent',
-    borderRight: '10px solid transparent',
-    borderBottom: '12px solid #36827F', // Add the color here
-    marginBottom: '4px',
-  },
-
-  pointerLine: {
-    width: '2px',
-    height: '12px',
-  },
-  inputContainer: {
-    display: 'flex',
-    gap: '10px',
-    marginBottom: '20px',
-  },
-  input: {
-    flex: '1',
-    padding: '12px 16px',
-    fontSize: '14px',
-    borderRadius: '8px',
-    border: '1px solid #E5E7EB',
-    outline: 'none',
-  },
-  button: {
-    backgroundColor: '#3B82F6',
-    color: 'white',
-    border: 'none',
-    padding: '12px 20px',
-    fontSize: '14px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontWeight: '600',
-  },
-  musicControls: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: '12px',
-    padding: '15px',
-  },
-  musicButton: {
-    width: '100%',
-    padding: '12px',
-    borderRadius: '8px',
-    border: 'none',
-    cursor: 'pointer',
-    fontWeight: '600',
-    fontSize: '14px',
-    color: 'white',
-    marginBottom: '12px',
-  },
-  volumeControl: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-  },
-  volumeLabel: {
-    fontSize: '12px',
-    fontWeight: '600',
-    color: '#4B5563',
-  },
-  volumeSlider: {
-    flex: '1',
-    height: '4px',
-    borderRadius: '2px',
-    backgroundColor: '#E5E7EB',
-    outline: 'none',
-  },
 };
 
 export default HeartRateMonitor;
