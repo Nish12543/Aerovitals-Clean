@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaComments, FaHeartbeat, FaBed, FaPlane, FaTimes } from 'react-icons/fa';
+import { FaHeartbeat, FaBed, FaPlane, FaTimes, FaThermometerHalf } from 'react-icons/fa';
 
 // Hamburger icon component
 function Hamburger({ onClick, isOpen }) {
@@ -278,6 +278,29 @@ function Sidebar({ isOpen, onClose }) {
                 Stress Level
               </Link>
             </li>
+            <li>
+              <Link 
+                to="/health-monitoring" 
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '1rem 1.5rem',
+                  color: 'white',
+                  textDecoration: 'none',
+                  fontSize: '1rem',
+                  borderRadius: '0 24px 24px 0',
+                  marginBottom: '0.5rem',
+                  transition: 'background 0.2s, color 0.2s',
+                  background: location.pathname === '/health-monitoring' ? 'rgba(255,255,255,0.18)' : 'transparent',
+                  color: location.pathname === '/health-monitoring' ? '#1e293b' : 'white',
+                  fontWeight: location.pathname === '/health-monitoring' ? 600 : 400,
+                }} 
+                onClick={onClose}
+              >
+                <FaThermometerHalf style={{ marginRight: '0.5rem' }} /> 
+                Health Monitoring
+              </Link>
+            </li>
           </ul>
         </nav>
       </motion.aside>
@@ -295,20 +318,17 @@ const MainLayout = ({ children }) => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
-      
-      // Only auto-open sidebar on desktop, never on mobile
-      if (!mobile && !sidebarOpen) {
+      // Only auto-open sidebar on desktop on initial mount
+      if (!mobile) {
         setSidebarOpen(true);
-      } else if (mobile) {
-        // Always close sidebar when on mobile
+      } else {
         setSidebarOpen(false);
       }
     };
-
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []); // Remove sidebarOpen from dependencies to prevent infinite loop
+  }, []); // Only run on mount/unmount
 
   // Close sidebar on route change (mobile UX)
   useEffect(() => {

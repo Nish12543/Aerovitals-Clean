@@ -14,9 +14,6 @@ const fieldDescriptions = {
   'Heart Rate': 'Beats per minute (40-200)'
 };
 
-const genderOptions = ['Male', 'Female'];
-const bmiOptions = ['Overweight', 'Normal', 'Obese'];
-
 const initialForm = {
   'Gender': '',
   'Age': '',
@@ -42,8 +39,8 @@ const fields = [
 ];
 
 const fieldOptions = {
-  'Gender': genderOptions,
-  'BMI Category': bmiOptions,
+  'Gender': ['Male', 'Female'],
+  'BMI Category': ['Overweight', 'Normal', 'Obese'],
 };
 
 const SleepDisorderForm = () => {

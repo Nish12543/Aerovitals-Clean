@@ -7,6 +7,7 @@ import StressLevelForm from './components/StressLevelForm';
 import LandingPage from './components/LandingPage';
 import { FaPlane } from 'react-icons/fa';
 import MainLayout from './components/MainLayout';
+import HealthMonitoring from './components/HealthMonitoring';
 
 function AppContent() {
   return (
@@ -68,6 +69,11 @@ function AppContent() {
         <Route path="/stress-level" element={
           <MainLayout>
             <StressLevelForm />
+          </MainLayout>
+        } />
+        <Route path="/health-monitoring" element={
+          <MainLayout>
+            <HealthMonitoring />
           </MainLayout>
         } />
       </Routes>
