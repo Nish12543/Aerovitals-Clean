@@ -15,15 +15,15 @@ const fieldDescriptions = {
 };
 
 const initialForm = {
-  'Gender': '',
-  'Age': '',
-  'Sleep Duration': '',
-  'Quality of Sleep': '',
-  'Physical Activity Level': '',
-  'BMI Category': '',
-  'systolic_bp': '',
-  'diastolic_bp': '',
-  'Heart Rate': '',
+    'Gender': '',
+    'Age': '',
+    'Sleep Duration': '',
+    'Quality of Sleep': '',
+    'Physical Activity Level': '',
+    'BMI Category': '',
+    'systolic_bp': '',
+    'diastolic_bp': '',
+    'Heart Rate': '',
 };
 
 const fields = [
@@ -96,12 +96,12 @@ const SleepDisorderForm = () => {
                 {infoOpen[field.name] && (
                   <span className="info-tooltip">{fieldDescriptions[field.name]}</span>
                 )}
-              </label>
+                </label>
               {field.type === 'select' ? (
-                <select
+                <select 
                   name={field.name}
                   value={form[field.name]}
-                  onChange={handleChange}
+                  onChange={handleChange} 
                   required={field.required}
                 >
                   <option value="">Select</option>
@@ -112,11 +112,11 @@ const SleepDisorderForm = () => {
                   ))}
                 </select>
               ) : (
-                <input
+                <input 
                   name={field.name}
                   type={field.type}
                   value={form[field.name]}
-                  onChange={handleChange}
+                  onChange={handleChange} 
                   required={field.required}
                   min={field.min}
                   max={field.max}

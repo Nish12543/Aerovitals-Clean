@@ -2,10 +2,44 @@ import React, { useState, useEffect } from 'react';
 
 const SPO2_THRESHOLD = 95;
 const TEMP_THRESHOLD = 37.5;
+const HEART_RATE_MIN = 50;
+const HEART_RATE_MAX = 120;
 
 const THINGSPEAK_CHANNEL_ID = process.env.REACT_APP_THINGSPEAK_CHANNEL_ID;
 // const THINGSPEAK_FIELD = 1; // Field number to display
 const THINGSPEAK_READ_API_KEY = process.env.REACT_APP_THINGSPEAK_READ_API_KEY;
+
+// Notification utility functions
+const requestNotificationPermission = async () => {
+  if (!('Notification' in window)) {
+    console.log('This browser does not support notifications');
+    return false;
+  }
+  
+  if (Notification.permission === 'granted') {
+    return true;
+  }
+  
+  if (Notification.permission !== 'denied') {
+    const permission = await Notification.requestPermission();
+    return permission === 'granted';
+  }
+  
+  return false;
+};
+
+const sendNotification = (title, body, icon = null) => {
+  if (Notification.permission === 'granted') {
+    new Notification(title, {
+      body,
+      icon,
+      badge: '/favicon.ico',
+      tag: 'health-alert',
+      requireInteraction: true,
+      silent: false
+    });
+  }
+};
 
 const ThingSpeakChart = ({ field, title }) => (
   <div style={{ margin: '1rem 0' }}>
@@ -24,15 +58,18 @@ const HealthMonitoring = () => {
   const [spo2, setSpo2] = useState('');
   const [temp, setTemp] = useState('');
   const [heartRate, setHeartRate] = useState('');
+  const [notificationPermission, setNotificationPermission] = useState(false);
+  const [previousValues, setPreviousValues] = useState({
+    spo2: null,
+    temp: null,
+    heartRate: null,
+  });
 
   const spo2Value = parseFloat(spo2);
   const tempValue = parseFloat(temp);
 
   const spo2Alert = spo2 && spo2Value < SPO2_THRESHOLD;
   const tempAlert = temp && tempValue > TEMP_THRESHOLD;
-
-  const HEART_RATE_MIN = 50;
-  const HEART_RATE_MAX = 120;
   const heartRateAlert = heartRate && (heartRate < HEART_RATE_MIN || heartRate > HEART_RATE_MAX);
 
   const [latest, setLatest] = useState({
@@ -40,6 +77,62 @@ const HealthMonitoring = () => {
     temp: null,
     heartRate: null,
   });
+
+  // Request notification permission on component mount
+  useEffect(() => {
+    requestNotificationPermission().then(permission => {
+      setNotificationPermission(permission);
+    });
+  }, []);
+
+  // Check for abnormal values and send notifications
+  useEffect(() => {
+    const checkAndNotify = (current, previous, type, threshold, unit) => {
+      if (current !== null && previous !== null && current !== previous) {
+        let isAbnormal = false;
+        let message = '';
+
+        switch (type) {
+          case 'spo2':
+            isAbnormal = current < threshold;
+            if (isAbnormal) {
+              message = `SpO₂ level is critically low: ${current}% (Normal: ≥${threshold}%)`;
+            }
+            break;
+          case 'temp':
+            isAbnormal = current > threshold;
+            if (isAbnormal) {
+              message = `Body temperature is elevated: ${current}°C (Normal: ≤${threshold}°C)`;
+            }
+            break;
+          case 'heartRate':
+            isAbnormal = current < HEART_RATE_MIN || current > HEART_RATE_MAX;
+            if (isAbnormal) {
+              message = `Heart rate is abnormal: ${current} bpm (Normal: ${HEART_RATE_MIN}-${HEART_RATE_MAX} bpm)`;
+            }
+            break;
+          default:
+            break;
+        }
+
+        if (isAbnormal && notificationPermission) {
+          sendNotification('Health Alert', message);
+        }
+      }
+    };
+
+    // Check each vital sign
+    checkAndNotify(latest.spo2, previousValues.spo2, 'spo2', SPO2_THRESHOLD, '%');
+    checkAndNotify(latest.temp, previousValues.temp, 'temp', TEMP_THRESHOLD, '°C');
+    checkAndNotify(latest.heartRate, previousValues.heartRate, 'heartRate', null, 'bpm');
+
+    // Update previous values
+    setPreviousValues({
+      spo2: latest.spo2,
+      temp: latest.temp,
+      heartRate: latest.heartRate,
+    });
+  }, [latest, previousValues, notificationPermission]);
 
   useEffect(() => {
     const fetchLatest = async () => {
@@ -55,7 +148,7 @@ const HealthMonitoring = () => {
           heartRate: parseFloat(feed.field3),
         });
       } catch (err) {
-        // Optionally handle error
+        console.error('Error fetching health data:', err);
       }
     };
     fetchLatest();
@@ -66,6 +159,44 @@ const HealthMonitoring = () => {
   return (
     <div className="health-monitoring-container">
       <h2 className="health-monitoring-title">Health Monitoring</h2>
+      
+      {/* Notification permission status */}
+      <div style={{ 
+        marginBottom: '1rem', 
+        padding: '0.5rem', 
+        borderRadius: '6px',
+        backgroundColor: notificationPermission ? '#dcfce7' : '#fef3c7',
+        border: `1px solid ${notificationPermission ? '#22c55e' : '#f59e0b'}`,
+        color: notificationPermission ? '#166534' : '#92400e',
+        fontSize: '0.9rem',
+        textAlign: 'center'
+      }}>
+        {notificationPermission ? 
+          '🔔 Push notifications enabled - You will be alerted for abnormal values' :
+          '🔕 Push notifications disabled - Click "Enable Notifications" to get alerts'
+        }
+        {!notificationPermission && (
+          <button
+            onClick={async () => {
+              const permission = await requestNotificationPermission();
+              setNotificationPermission(permission);
+            }}
+            style={{
+              marginLeft: '0.5rem',
+              padding: '0.25rem 0.5rem',
+              backgroundColor: '#2563eb',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.8rem'
+            }}
+          >
+            Enable Notifications
+          </button>
+        )}
+      </div>
+
       <div className="latest-values" style={{ marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'none', border: 'none', boxShadow: 'none', padding: 0 }}>
         <div>
           Latest SpO₂: <span style={{ color: latest.spo2 !== null && latest.spo2 < SPO2_THRESHOLD ? '#ef4444' : '#22c55e', fontWeight: 600 }}>
@@ -92,6 +223,7 @@ const HealthMonitoring = () => {
           </span>
         </div>
       </div>
+      
       <div className="health-monitoring-charts-grid" style={{ marginTop: '2rem' }}>
         <ThingSpeakChart field={1} title="SpO₂ (%)" />
         <ThingSpeakChart field={2} title="Body Temperature (°C)" />

@@ -17,14 +17,14 @@ const genderOptions = ['Male', 'Female'];
 const bmiOptions = ['Overweight', 'Normal', 'Obese'];
 
 const initialForm = {
-  'Gender': '',
-  'Age': '',
-  'Sleep Duration': '',
-  'Quality of Sleep': '',
-  'Physical Activity Level': '',
-  'BMI Category': '',
+    'Gender': '',
+    'Age': '',
+    'Sleep Duration': '',
+    'Quality of Sleep': '',
+    'Physical Activity Level': '',
+    'BMI Category': '',
   'Blood Pressure': '',
-  'Heart Rate': '',
+    'Heart Rate': '',
 };
 
 const fields = [
@@ -112,12 +112,12 @@ const StressLevelForm = () => {
                 {infoOpen[field.name] && (
                   <span className="info-tooltip">{fieldDescriptions[field.name]}</span>
                 )}
-              </label>
+                </label>
               {field.type === 'select' ? (
-                <select
+                <select 
                   name={field.name}
                   value={form[field.name]}
-                  onChange={handleChange}
+                  onChange={handleChange} 
                   required={field.required}
                 >
                   <option value="">Select</option>
@@ -128,11 +128,11 @@ const StressLevelForm = () => {
                   ))}
                 </select>
               ) : (
-                <input
+                <input 
                   name={field.name}
                   type={field.type}
                   value={form[field.name]}
-                  onChange={handleChange}
+                  onChange={handleChange} 
                   required={field.required}
                   min={field.min}
                   max={field.max}
@@ -147,9 +147,9 @@ const StressLevelForm = () => {
           ))}
         </div>
         <button type="submit" className="responsive-form-submit">
-          Predict Stress Level
-        </button>
-        {result && (
+              Predict Stress Level
+            </button>
+            {result && (
           <div className="responsive-form-result">
             Prediction: {
               !isNaN(Number(result))
@@ -162,9 +162,9 @@ const StressLevelForm = () => {
                         : result)
                 : result
             }
-          </div>
-        )}
-      </form>
+              </div>
+            )}
+          </form>
       <style>{`
         .responsive-form-container {
           max-width: 600px;
