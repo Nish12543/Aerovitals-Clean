@@ -37,13 +37,37 @@ function AppContent() {
             background-position: 0% 50%;
           }
         }
+        .dashboard-flex-row {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 2rem;
+          width: 100%;
+        }
+        .dashboard-column {
+          flex: 1;
+          min-width: 350px;
+          max-width: 600px;
+        }
+        @media (max-width: 700px) {
+          .dashboard-flex-row {
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+          }
+          .dashboard-column {
+            min-width: 0;
+            max-width: 100%;
+            width: 100%;
+          }
+        }
       `}</style>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/dashboard" element={
           <MainLayout>
-            <div style={styles.flexRow}>
-              <div style={styles.column}>
+            <div className="dashboard-flex-row">
+              <div className="dashboard-column">
                 <div style={styles.card}>
                   <h2 style={{ display: 'flex', alignItems: 'center', fontSize: '1.7rem', fontWeight: 700, color: '#2563eb', marginBottom: '1.5rem' }}>
                     <FaPlane style={{ marginRight: 10 }} /> AeroVitals
@@ -52,7 +76,7 @@ function AppContent() {
                   <HeartRateMonitor />
                 </div>
               </div>
-              <div style={styles.column}>
+              <div className="dashboard-column">
                 <div style={styles.card}>
                   <h2 style={styles.cardTitle}>First Aid Assistant</h2>
                   <Chatbot />
