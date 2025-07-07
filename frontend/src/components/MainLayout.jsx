@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaHeartbeat, FaBed, FaPlane, FaTimes, FaThermometerHalf } from 'react-icons/fa';
+import userImg from '../images/user.jpg';
 
 // Hamburger icon component
 function Hamburger({ onClick, isOpen }) {
@@ -180,7 +181,7 @@ function Sidebar({ isOpen, onClose }) {
           marginBottom: '2rem',
         }}>
           <img 
-            src="frontend\\src\\images\\passenger.png" 
+            src={userImg} 
             alt="Passenger" 
             style={{
               width: '56px',
