@@ -149,7 +149,21 @@ const StressLevelForm = () => {
         <button type="submit" className="responsive-form-submit">
           Predict Stress Level
         </button>
-        {result && <div className="responsive-form-result">Prediction: {result}</div>}
+        {result && (
+          <div className="responsive-form-result">
+            Prediction: {
+              !isNaN(Number(result))
+                ? (Number(result) >= 1 && Number(result) <= 4
+                    ? 'Low'
+                    : Number(result) >= 5 && Number(result) <= 7
+                      ? 'Medium'
+                      : Number(result) >= 8 && Number(result) <= 10
+                        ? 'High'
+                        : result)
+                : result
+            }
+          </div>
+        )}
       </form>
       <style>{`
         .responsive-form-container {

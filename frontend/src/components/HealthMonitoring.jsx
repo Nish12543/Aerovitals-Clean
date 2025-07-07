@@ -1,11 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const SPO2_THRESHOLD = 95;
 const TEMP_THRESHOLD = 37.5;
 
+const THINGSPEAK_CHANNEL_ID = process.env.REACT_APP_THINGSPEAK_CHANNEL_ID;
+// const THINGSPEAK_FIELD = 1; // Field number to display
+const THINGSPEAK_READ_API_KEY = process.env.REACT_APP_THINGSPEAK_READ_API_KEY;
+
+const ThingSpeakChart = ({ field, title }) => (
+  <div style={{ margin: '1rem 0' }}>
+    <h4 style={{ textAlign: 'center', color: '#2563eb' }}>{title}</h4>
+    <iframe
+      width="450"
+      height="260"
+      style={{ border: '1px solid #ccc', borderRadius: '8px', width: '100%', maxWidth: 450 }}
+      src={`https://thingspeak.com/channels/${THINGSPEAK_CHANNEL_ID}/charts/${field}?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&api_key=${THINGSPEAK_READ_API_KEY}&update=10`}
+      title={title}
+    />
+  </div>
+);
+
 const HealthMonitoring = () => {
   const [spo2, setSpo2] = useState('');
   const [temp, setTemp] = useState('');
+  const [heartRate, setHeartRate] = useState('');
 
   const spo2Value = parseFloat(spo2);
   const tempValue = parseFloat(temp);
@@ -13,64 +31,72 @@ const HealthMonitoring = () => {
   const spo2Alert = spo2 && spo2Value < SPO2_THRESHOLD;
   const tempAlert = temp && tempValue > TEMP_THRESHOLD;
 
+  const HEART_RATE_MIN = 50;
+  const HEART_RATE_MAX = 120;
+  const heartRateAlert = heartRate && (heartRate < HEART_RATE_MIN || heartRate > HEART_RATE_MAX);
+
+  const [latest, setLatest] = useState({
+    spo2: null,
+    temp: null,
+    heartRate: null,
+  });
+
+  useEffect(() => {
+    const fetchLatest = async () => {
+      try {
+        const res = await fetch(
+          `https://api.thingspeak.com/channels/${THINGSPEAK_CHANNEL_ID}/feeds.json?api_key=${THINGSPEAK_READ_API_KEY}&results=1`
+        );
+        const data = await res.json();
+        const feed = data.feeds[0] || {};
+        setLatest({
+          spo2: parseFloat(feed.field1),
+          temp: parseFloat(feed.field2),
+          heartRate: parseFloat(feed.field3),
+        });
+      } catch (err) {
+        // Optionally handle error
+      }
+    };
+    fetchLatest();
+    const interval = setInterval(fetchLatest, 10000); // Poll every 10 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="health-monitoring-container">
       <h2 className="health-monitoring-title">Health Monitoring</h2>
-      <form className="health-monitoring-form" onSubmit={e => e.preventDefault()}>
-        <div className="health-monitoring-grid">
-          <div className="health-monitoring-field">
-            <label htmlFor="spo2">SpO₂ (%):</label>
-            <input
-              id="spo2"
-              type="number"
-              min="70"
-              max="100"
-              value={spo2}
-              onChange={e => setSpo2(e.target.value)}
-              placeholder="e.g. 98"
-              required
-            />
-            <div className="visual-bar-wrapper">
-              <div
-                className="visual-bar"
-                style={{
-                  width: spo2 ? `${Math.min(Math.max(spo2Value, 70), 100)}%` : '0%',
-                  background: spo2Alert ? '#ef4444' : '#22c55e',
-                }}
-              />
-            </div>
-            {spo2Alert && (
-              <div className="alert">⚠️ SpO₂ is below normal! (Threshold: {SPO2_THRESHOLD}%)</div>
-            )}
-          </div>
-          <div className="health-monitoring-field">
-            <label htmlFor="temp">Body Temperature (°C):</label>
-            <input
-              id="temp"
-              type="number"
-              min="30"
-              max="45"
-              step="0.1"
-              value={temp}
-              onChange={e => setTemp(e.target.value)}
-              placeholder="e.g. 36.8"
-              required
-            />
-            <div className="visual-bar-wrapper">
-              <div
-                className="visual-bar"
-                style={{
-                  width: temp ? `${Math.min(Math.max((tempValue - 30) * 4, 0), 100)}%` : '0%',
-                  background: tempAlert ? '#ef4444' : '#3b82f6',
-                }}
-              />
-            </div>
-            {tempAlert && (
-              <div className="alert">⚠️ Body temperature is above normal! (Threshold: {TEMP_THRESHOLD}°C)</div>
-            )}
-          </div>
+      <div className="latest-values" style={{ marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'none', border: 'none', boxShadow: 'none', padding: 0 }}>
+        <div>
+          Latest SpO₂: <span style={{ color: latest.spo2 !== null && latest.spo2 < SPO2_THRESHOLD ? '#ef4444' : '#22c55e', fontWeight: 600 }}>
+            {latest.spo2 ?? 'Loading...'}%
+          </span>
+          <span style={{ marginLeft: 8, color: '#64748b', fontSize: '0.95em' }}>
+            (Threshold: {SPO2_THRESHOLD}%)
+          </span>
         </div>
-      </form>
+        <div>
+          Latest Body Temp: <span style={{ color: latest.temp !== null && latest.temp > TEMP_THRESHOLD ? '#ef4444' : '#22c55e', fontWeight: 600 }}>
+            {latest.temp ?? 'Loading...'}°C
+          </span>
+          <span style={{ marginLeft: 8, color: '#64748b', fontSize: '0.95em' }}>
+            (Threshold: {TEMP_THRESHOLD}°C)
+          </span>
+        </div>
+        <div>
+          Latest Heart Rate: <span style={{ color: latest.heartRate !== null && (latest.heartRate < HEART_RATE_MIN || latest.heartRate > HEART_RATE_MAX) ? '#ef4444' : '#22c55e', fontWeight: 600 }}>
+            {latest.heartRate ?? 'Loading...'} bpm
+          </span>
+          <span style={{ marginLeft: 8, color: '#64748b', fontSize: '0.95em' }}>
+            (Range: {HEART_RATE_MIN}-{HEART_RATE_MAX} bpm)
+          </span>
+        </div>
+      </div>
+      <div className="health-monitoring-charts-grid" style={{ marginTop: '2rem' }}>
+        <ThingSpeakChart field={1} title="SpO₂ (%)" />
+        <ThingSpeakChart field={2} title="Body Temperature (°C)" />
+        <ThingSpeakChart field={3} title="Heart Rate (bpm)" />
+      </div>
       <style>{`
         .health-monitoring-container {
           max-width: 500px;
@@ -79,6 +105,12 @@ const HealthMonitoring = () => {
           background: #f4f8fb;
           border-radius: 12px;
           box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        @media (min-width: 1100px) {
+          .health-monitoring-container {
+            max-width: 1100px;
+            padding: 2.5rem;
+          }
         }
         .health-monitoring-title {
           text-align: center;
@@ -135,9 +167,19 @@ const HealthMonitoring = () => {
           font-size: 0.98rem;
           margin-top: 0.25rem;
         }
-        @media (min-width: 600px) {
-          .health-monitoring-grid {
+        .health-monitoring-charts-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+        @media (min-width: 700px) {
+          .health-monitoring-charts-grid {
             grid-template-columns: 1fr 1fr;
+          }
+        }
+        @media (min-width: 1100px) {
+          .health-monitoring-charts-grid {
+            grid-template-columns: 1fr 1fr 1fr;
           }
         }
         @media (max-width: 480px) {
