@@ -61,6 +61,42 @@ def heart_rate():
     play_music = should_play_music(hr)  # Check if we need to play calming music
     return jsonify({'play_music': play_music})  # Return the result
 
+@app.route('/health-monitoring', methods=['GET'])
+def health_monitoring():
+    """Get health monitoring data - can be extended to fetch from sensors or ThingSpeak"""
+    try:
+        # For now, return mock data. In production, this would fetch from sensors or ThingSpeak
+        import random
+        import time
+        
+        # Generate realistic mock data
+        current_time = int(time.time())
+        spo2 = random.uniform(95, 100)  # Normal SpO2 range
+        temp = random.uniform(36.0, 37.5)  # Normal body temperature
+        heart_rate = random.uniform(60, 100)  # Normal heart rate range
+        
+        # Add some variation based on time to simulate real data
+        spo2 += random.uniform(-1, 1) * (current_time % 60) / 60
+        temp += random.uniform(-0.2, 0.2) * (current_time % 60) / 60
+        heart_rate += random.uniform(-5, 5) * (current_time % 60) / 60
+        
+        # Ensure values are within realistic bounds
+        spo2 = max(90, min(100, spo2))
+        temp = max(35.5, min(38.0, temp))
+        heart_rate = max(50, min(120, heart_rate))
+        
+        return jsonify({
+            'spo2': round(spo2, 1),
+            'temperature': round(temp, 1),
+            'heart_rate': round(heart_rate, 0),
+            'timestamp': current_time,
+            'source': 'mock_data'
+        })
+        
+    except Exception as e:
+        print(f"Error in health monitoring: {str(e)}")
+        return jsonify({'error': f'Health monitoring failed: {str(e)}'}), 500
+
 @app.route('/predict_sleep_disorder', methods=['POST'])
 def predict_sleep_disorder():
     try:

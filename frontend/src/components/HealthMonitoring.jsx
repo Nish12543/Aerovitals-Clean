@@ -5,9 +5,12 @@ const TEMP_THRESHOLD = 37.5;
 const HEART_RATE_MIN = 50;
 const HEART_RATE_MAX = 120;
 
+// Check if environment variables are available
 const THINGSPEAK_CHANNEL_ID = process.env.REACT_APP_THINGSPEAK_CHANNEL_ID;
-// const THINGSPEAK_FIELD = 1; // Field number to display
 const THINGSPEAK_READ_API_KEY = process.env.REACT_APP_THINGSPEAK_READ_API_KEY;
+
+// Check if ThingSpeak is properly configured
+const isThingSpeakConfigured = THINGSPEAK_CHANNEL_ID && THINGSPEAK_READ_API_KEY;
 
 // Notification utility functions
 const requestNotificationPermission = async () => {
@@ -41,18 +44,38 @@ const sendNotification = (title, body, icon = null) => {
   }
 };
 
-const ThingSpeakChart = ({ field, title }) => (
-  <div style={{ margin: '1rem 0' }}>
-    <h4 style={{ textAlign: 'center', color: '#2563eb' }}>{title}</h4>
-    <iframe
-      width="450"
-      height="260"
-      style={{ border: '1px solid #ccc', borderRadius: '8px', width: '100%', maxWidth: 450 }}
-      src={`https://thingspeak.com/channels/${THINGSPEAK_CHANNEL_ID}/charts/${field}?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&api_key=${THINGSPEAK_READ_API_KEY}&update=10`}
-      title={title}
-    />
-  </div>
-);
+const ThingSpeakChart = ({ field, title }) => {
+  if (!isThingSpeakConfigured) {
+    return (
+      <div style={{ 
+        margin: '1rem 0', 
+        padding: '1rem', 
+        backgroundColor: '#fef3c7', 
+        border: '1px solid #f59e0b',
+        borderRadius: '8px',
+        textAlign: 'center'
+      }}>
+        <h4 style={{ color: '#92400e', margin: '0 0 0.5rem 0' }}>{title}</h4>
+        <p style={{ color: '#92400e', margin: 0, fontSize: '0.9rem' }}>
+          ThingSpeak not configured. Please set REACT_APP_THINGSPEAK_CHANNEL_ID and REACT_APP_THINGSPEAK_READ_API_KEY environment variables.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ margin: '1rem 0' }}>
+      <h4 style={{ textAlign: 'center', color: '#2563eb' }}>{title}</h4>
+      <iframe
+        width="450"
+        height="260"
+        style={{ border: '1px solid #ccc', borderRadius: '8px', width: '100%', maxWidth: 450 }}
+        src={`https://thingspeak.com/channels/${THINGSPEAK_CHANNEL_ID}/charts/${field}?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&api_key=${THINGSPEAK_READ_API_KEY}&update=10`}
+        title={title}
+      />
+    </div>
+  );
+};
 
 const HealthMonitoring = () => {
   const [spo2, setSpo2] = useState('');
@@ -60,6 +83,15 @@ const HealthMonitoring = () => {
   const [heartRate, setHeartRate] = useState('');
   const [notificationPermission, setNotificationPermission] = useState(false);
   const [previousValues, setPreviousValues] = useState({
+    spo2: null,
+    temp: null,
+    heartRate: null,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Store the last valid value for each vital
+  const [lastValid, setLastValid] = useState({
     spo2: null,
     temp: null,
     heartRate: null,
@@ -77,6 +109,24 @@ const HealthMonitoring = () => {
     temp: null,
     heartRate: null,
   });
+
+  const [latestThingSpeak, setLatestThingSpeak] = useState({
+    spo2: null,
+    temp: null,
+    heartRate: null,
+    timestamp: null,
+  });
+  const [loadingThingSpeak, setLoadingThingSpeak] = useState(false);
+  const [errorThingSpeak, setErrorThingSpeak] = useState(null);
+
+  // Update last valid values whenever latest changes
+  useEffect(() => {
+    setLastValid(prev => ({
+      spo2: latest.spo2 != null ? latest.spo2 : prev.spo2,
+      temp: latest.temp != null ? latest.temp : prev.temp,
+      heartRate: latest.heartRate != null ? latest.heartRate : prev.heartRate,
+    }));
+  }, [latest]);
 
   // Request notification permission on component mount
   useEffect(() => {
@@ -134,21 +184,49 @@ const HealthMonitoring = () => {
     });
   }, [latest, previousValues, notificationPermission]);
 
+  // Fetch latest values from ThingSpeak API
   useEffect(() => {
+    if (!isThingSpeakConfigured) return;
     const fetchLatest = async () => {
+      setLoadingThingSpeak(true);
+      setErrorThingSpeak(null);
       try {
         const res = await fetch(
-          `https://api.thingspeak.com/channels/${THINGSPEAK_CHANNEL_ID}/feeds.json?api_key=${THINGSPEAK_READ_API_KEY}&results=1`
+          `https://api.thingspeak.com/channels/${THINGSPEAK_CHANNEL_ID}/feeds.json?api_key=${THINGSPEAK_READ_API_KEY}&results=60`
         );
+        if (!res.ok) throw new Error('Failed to fetch ThingSpeak data');
         const data = await res.json();
-        const feed = data.feeds[0] || {};
-        setLatest({
-          spo2: parseFloat(feed.field1),
-          temp: parseFloat(feed.field2),
-          heartRate: parseFloat(feed.field3),
+        // Find the last non-null value for each field
+        let lastSpo2 = null, lastTemp = null, lastHeartRate = null, lastTimestamp = null;
+        if (data.feeds && data.feeds.length > 0) {
+          for (let i = data.feeds.length - 1; i >= 0; i--) {
+            const feed = data.feeds[i];
+            if (lastSpo2 === null && feed.field1) {
+              lastSpo2 = parseFloat(feed.field1);
+              if (!lastTimestamp) lastTimestamp = feed.created_at;
+            }
+            if (lastTemp === null && feed.field2) {
+              lastTemp = parseFloat(feed.field2);
+              if (!lastTimestamp) lastTimestamp = feed.created_at;
+            }
+            if (lastHeartRate === null && feed.field3) {
+              lastHeartRate = parseFloat(feed.field3);
+              if (!lastTimestamp) lastTimestamp = feed.created_at;
+            }
+            if (lastSpo2 !== null && lastTemp !== null && lastHeartRate !== null) break;
+          }
+        }
+        setLatestThingSpeak({
+          spo2: lastSpo2,
+          temp: lastTemp,
+          heartRate: lastHeartRate,
+          timestamp: lastTimestamp,
         });
       } catch (err) {
-        console.error('Error fetching health data:', err);
+        setErrorThingSpeak('Could not fetch latest data from ThingSpeak.');
+        setLatestThingSpeak({ spo2: null, temp: null, heartRate: null, timestamp: null });
+      } finally {
+        setLoadingThingSpeak(false);
       }
     };
     fetchLatest();
@@ -159,6 +237,39 @@ const HealthMonitoring = () => {
   return (
     <div className="health-monitoring-container">
       <h2 className="health-monitoring-title">Health Monitoring</h2>
+      
+      {/* Configuration status */}
+      <div style={{ 
+        marginBottom: '1rem', 
+        padding: '0.75rem', 
+        borderRadius: '6px',
+        backgroundColor: isThingSpeakConfigured ? '#dcfce7' : '#fef3c7',
+        border: `1px solid ${isThingSpeakConfigured ? '#22c55e' : '#f59e0b'}`,
+        color: isThingSpeakConfigured ? '#166534' : '#92400e',
+        fontSize: '0.9rem',
+        textAlign: 'center'
+      }}>
+        {isThingSpeakConfigured ? 
+          '✅ Health monitoring active - Data source: Backend API + ThingSpeak' :
+          '⚠️ Health monitoring active - Data source: Backend API (ThingSpeak charts in demo mode)'
+        }
+      </div>
+      
+      {/* Error display */}
+      {error && (
+        <div style={{ 
+          marginBottom: '1rem', 
+          padding: '0.75rem', 
+          borderRadius: '6px',
+          backgroundColor: '#fee2e2',
+          border: '1px solid #fca5a5',
+          color: '#991b1b',
+          fontSize: '0.9rem',
+          textAlign: 'center'
+        }}>
+          ❌ {error}
+        </div>
+      )}
       
       {/* Notification permission status */}
       <div style={{ 
@@ -199,35 +310,54 @@ const HealthMonitoring = () => {
 
       <div className="latest-values" style={{ marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'none', border: 'none', boxShadow: 'none', padding: 0 }}>
         <div>
-          Latest SpO₂: <span style={{ color: latest.spo2 !== null && latest.spo2 < SPO2_THRESHOLD ? '#ef4444' : '#22c55e', fontWeight: 600 }}>
-            {latest.spo2 ?? 'Loading...'}%
+          Latest SpO₂: <span style={{ color: latestThingSpeak.spo2 !== null && latestThingSpeak.spo2 < SPO2_THRESHOLD ? '#ef4444' : '#22c55e', fontWeight: 600 }}>
+            {isThingSpeakConfigured ?
+              (loadingThingSpeak ? 'Loading...' : (latestThingSpeak.spo2 !== null ? `${latestThingSpeak.spo2}%` : 'No data'))
+              : 'No data'}
           </span>
           <span style={{ marginLeft: 8, color: '#64748b', fontSize: '0.95em' }}>
             (Threshold: {SPO2_THRESHOLD}%)
           </span>
         </div>
         <div>
-          Latest Body Temp: <span style={{ color: latest.temp !== null && latest.temp > TEMP_THRESHOLD ? '#ef4444' : '#22c55e', fontWeight: 600 }}>
-            {latest.temp ?? 'Loading...'}°C
+          Latest Body Temp: <span style={{ color: latestThingSpeak.temp !== null && latestThingSpeak.temp > TEMP_THRESHOLD ? '#ef4444' : '#22c55e', fontWeight: 600 }}>
+            {isThingSpeakConfigured ?
+              (loadingThingSpeak ? 'Loading...' : (latestThingSpeak.temp !== null ? `${latestThingSpeak.temp}°C` : 'No data'))
+              : 'No data'}
           </span>
           <span style={{ marginLeft: 8, color: '#64748b', fontSize: '0.95em' }}>
             (Threshold: {TEMP_THRESHOLD}°C)
           </span>
         </div>
         <div>
-          Latest Heart Rate: <span style={{ color: latest.heartRate !== null && (latest.heartRate < HEART_RATE_MIN || latest.heartRate > HEART_RATE_MAX) ? '#ef4444' : '#22c55e', fontWeight: 600 }}>
-            {latest.heartRate ?? 'Loading...'} bpm
+          Latest Heart Rate: <span style={{ color: latestThingSpeak.heartRate !== null && (latestThingSpeak.heartRate < HEART_RATE_MIN || latestThingSpeak.heartRate > HEART_RATE_MAX) ? '#ef4444' : '#22c55e', fontWeight: 600 }}>
+            {isThingSpeakConfigured ?
+              (loadingThingSpeak ? 'Loading...' : (latestThingSpeak.heartRate !== null ? `${latestThingSpeak.heartRate} bpm` : 'No data'))
+              : 'No data'}
           </span>
           <span style={{ marginLeft: 8, color: '#64748b', fontSize: '0.95em' }}>
             (Range: {HEART_RATE_MIN}-{HEART_RATE_MAX} bpm)
           </span>
         </div>
+        {errorThingSpeak && <div style={{ color: '#ef4444', fontSize: '0.9em' }}>{errorThingSpeak}</div>}
       </div>
       
       <div className="health-monitoring-charts-grid" style={{ marginTop: '2rem' }}>
-        <ThingSpeakChart field={1} title="SpO₂ (%)" />
-        <ThingSpeakChart field={2} title="Body Temperature (°C)" />
-        <ThingSpeakChart field={3} title="Heart Rate (bpm)" />
+        <ThingSpeakChart 
+          key={`spo2-${latest.spo2}`}
+          field={1} 
+          title="SpO₂ (%)" 
+        />
+        <ThingSpeakChart 
+          key={`temp-${latest.temp}`}
+          field={2} 
+          title="Body Temperature (°C)" 
+        />
+        <ThingSpeakChart 
+          key={`hr-${latest.heartRate}`}
+          field={3} 
+          title="Heart Rate (bpm)" 
+        />
       </div>
       <style>{`
         .health-monitoring-container {

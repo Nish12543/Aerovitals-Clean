@@ -129,6 +129,22 @@ A fully responsive React application for in-flight personal health monitoring wi
 - Node.js 14+ 
 - npm or yarn
 
+### Environment Variables
+
+For the Health Monitoring feature to work with real sensor data, you need to configure ThingSpeak environment variables. Create a `.env` file in the frontend directory:
+
+```bash
+# ThingSpeak Configuration for Health Monitoring
+# Get these values from your ThingSpeak channel settings
+REACT_APP_THINGSPEAK_CHANNEL_ID=your_channel_id_here
+REACT_APP_THINGSPEAK_READ_API_KEY=your_read_api_key_here
+
+# Backend API URL (optional - defaults to production URL)
+REACT_APP_API_BASE_URL=https://aerovitals-backend.onrender.com
+```
+
+**Note**: If ThingSpeak is not configured, the Health Monitoring page will display mock data for demonstration purposes.
+
 ### Installation
 ```bash
 cd frontend
